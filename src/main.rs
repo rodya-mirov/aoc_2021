@@ -3,6 +3,7 @@ use std::fmt::{Display, Formatter, Write};
 use std::time::Instant;
 
 mod day1;
+mod day2;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 enum Side {
@@ -45,6 +46,8 @@ fn main() -> Result<(), String> {
         let out: String = match (a, b) {
             (1, Side::A) => Ok(day1::a().to_string()),
             (1, Side::B) => Ok(day1::b().to_string()),
+            (2, Side::A) => Ok(day2::a().to_string()),
+            (2, Side::B) => Ok(day2::b().to_string()),
             (day, side) => Err(format!("Day {}, side {} is not yet supported", day, side)),
         }?;
 
