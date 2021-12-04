@@ -42,6 +42,17 @@ fn b_with_input(input_file: &str) -> u64 {
     (x.abs() as u64) * (y.abs() as u64)
 }
 
+fn read_file(file_path: &str) -> Vec<FullCommand> {
+    let mut f = File::open(file_path).unwrap();
+    let mut buffer = String::new();
+    f.read_to_string(&mut buffer).unwrap();
+
+    buffer
+        .lines()
+        .map(|line| line.parse::<FullCommand>().unwrap())
+        .collect()
+}
+
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
 enum Command {
     Up,
@@ -60,17 +71,6 @@ impl FromStr for Command {
             _ => Err(()),
         }
     }
-}
-
-fn read_file(file_path: &str) -> Vec<FullCommand> {
-    let mut f = File::open(file_path).unwrap();
-    let mut buffer = String::new();
-    f.read_to_string(&mut buffer).unwrap();
-
-    buffer
-        .lines()
-        .map(|line| line.parse::<FullCommand>().unwrap())
-        .collect()
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]

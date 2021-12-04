@@ -4,6 +4,7 @@ use std::time::Instant;
 
 mod day1;
 mod day2;
+mod day3;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 enum Side {
@@ -48,6 +49,8 @@ fn main() -> Result<(), String> {
             (1, Side::B) => Ok(day1::b().to_string()),
             (2, Side::A) => Ok(day2::a().to_string()),
             (2, Side::B) => Ok(day2::b().to_string()),
+            (3, Side::A) => Ok(day3::a().to_string()),
+            (3, Side::B) => Ok(day3::b().to_string()),
             (day, side) => Err(format!("Day {}, side {} is not yet supported", day, side)),
         }?;
 
