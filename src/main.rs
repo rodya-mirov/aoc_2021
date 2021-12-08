@@ -2,11 +2,15 @@ use std::env;
 use std::fmt::{Display, Formatter, Write};
 use std::time::Instant;
 
+mod helpers;
+
 mod day1;
 mod day2;
 mod day3;
 mod day4;
 mod day5;
+
+mod day6;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 enum Side {
@@ -57,6 +61,8 @@ fn main() -> Result<(), String> {
             (4, Side::B) => Ok(day4::b().to_string()),
             (5, Side::A) => Ok(day5::a().to_string()),
             (5, Side::B) => Ok(day5::b().to_string()),
+            (6, Side::A) => Ok(day6::a().to_string()),
+            (6, Side::B) => Ok(day6::b().to_string()),
             (day, side) => Err(format!("Day {}, side {} is not yet supported", day, side)),
         }?;
 
