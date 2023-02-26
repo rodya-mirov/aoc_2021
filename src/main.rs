@@ -9,6 +9,7 @@ use std::time::Instant;
 mod helpers;
 
 mod day1;
+mod day10;
 mod day2;
 mod day3;
 mod day4;
@@ -75,6 +76,8 @@ fn main() -> Result<(), String> {
             (8, Side::B) => Ok(day8::b()),
             (9, Side::A) => Ok(day9::a()),
             (9, Side::B) => Ok(day9::b()),
+            (10, Side::A) => Ok(day10::a()),
+            (10, Side::B) => Ok(day10::b()),
             (day, side) => Err(format!("Day {}, side {} is not yet supported", day, side)),
         }?;
 
