@@ -59,7 +59,7 @@ fn compute_oxygen(numbers: &[u64], input_length: usize, bit_idx: usize) -> u64 {
         return numbers[0];
     }
 
-    if numbers.len() == 0 || bit_idx >= input_length {
+    if numbers.is_empty() || bit_idx >= input_length {
         panic!();
     }
 
@@ -96,7 +96,7 @@ fn compute_scrubber(numbers: &[u64], input_length: usize, bit_idx: usize) -> u64
         return numbers[0];
     }
 
-    if numbers.len() == 0 || bit_idx >= input_length {
+    if numbers.is_empty() || bit_idx >= input_length {
         panic!();
     }
 

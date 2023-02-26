@@ -1,3 +1,7 @@
+// I disagree with specific applications of this lint often enough that I'm just turning it off
+// globally
+#![allow(clippy::needless_range_loop)]
+
 use std::env;
 use std::fmt::{Display, Formatter, Write};
 use std::time::Instant;
@@ -12,6 +16,7 @@ mod day5;
 mod day6;
 mod day7;
 mod day8;
+mod day9;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 enum Side {
@@ -68,6 +73,8 @@ fn main() -> Result<(), String> {
             (7, Side::B) => Ok(day7::b()),
             (8, Side::A) => Ok(day8::a()),
             (8, Side::B) => Ok(day8::b()),
+            (9, Side::A) => Ok(day9::a()),
+            (9, Side::B) => Ok(day9::b()),
             (day, side) => Err(format!("Day {}, side {} is not yet supported", day, side)),
         }?;
 
