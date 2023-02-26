@@ -17,7 +17,7 @@ fn a_with_input(input_file: &str) -> u64 {
             Command::Forward => x += command.1,
         }
     }
-    (x.abs() as u64) * (y.abs() as u64)
+    (x.unsigned_abs()) * (y.unsigned_abs())
 }
 
 pub fn b() -> u64 {
@@ -39,7 +39,7 @@ fn b_with_input(input_file: &str) -> u64 {
             }
         }
     }
-    (x.abs() as u64) * (y.abs() as u64)
+    (x.unsigned_abs()) * (y.unsigned_abs())
 }
 
 fn read_file(file_path: &str) -> Vec<FullCommand> {

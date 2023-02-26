@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::collections::HashSet;
 use std::fs::File;
 use std::io::Read;
@@ -108,12 +109,10 @@ fn b_with_input(input_path: &str) -> usize {
 }
 
 fn dir(a: i64, b: i64) -> i64 {
-    if a < b {
-        1
-    } else if a > b {
-        -1
-    } else {
-        0
+    match a.cmp(&b) {
+        Ordering::Less => 1,
+        Ordering::Equal => 0,
+        Ordering::Greater => -1,
     }
 }
 
@@ -125,7 +124,7 @@ fn parse(path: &str) -> Vec<((i64, i64), (i64, i64))> {
         .unwrap();
 
     let comma_pair = |s: &str| {
-        let mut toks = s.split(",").map(|t| t.parse::<i64>().unwrap());
+        let mut toks = s.split(',').map(|t| t.parse::<i64>().unwrap());
         let a = toks.next().unwrap();
         let b = toks.next().unwrap();
         assert!(toks.next().is_none());

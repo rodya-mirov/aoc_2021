@@ -12,7 +12,7 @@ pub fn a() -> String {
 
 fn a_with_input(input: &str) -> u32 {
     let mut all_pos: Vec<i32> = input
-        .split(",")
+        .split(',')
         .map(|tok| tok.parse::<i32>().unwrap())
         .collect();
     all_pos.sort();
@@ -39,7 +39,7 @@ pub fn b() -> String {
 
 fn b_with_input(input: &str) -> u32 {
     let mut all_pos: Vec<i32> = input
-        .split(",")
+        .split(',')
         .map(|tok| tok.parse::<i32>().unwrap())
         .collect();
     all_pos.sort();
@@ -58,7 +58,7 @@ fn b_with_input(input: &str) -> u32 {
             .iter()
             .copied()
             .map(|p| p.abs_diff(goal))
-            .map(|dist| fuel_cost(dist))
+            .map(fuel_cost)
             .sum();
         best = best.min(cost);
     }

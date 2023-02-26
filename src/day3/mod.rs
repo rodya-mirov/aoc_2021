@@ -9,12 +9,7 @@ fn a_with_input(input_file: &str, input_length: usize) -> u64 {
     let vals = read_file(input_file);
 
     // idx -> num lines with bit one at that idx
-    let mut one_counts: Vec<usize> = Vec::new();
-
-    // i guess strictly speaking i should figure this out from the file but like, ugh
-    for _ in 0..input_length {
-        one_counts.push(0);
-    }
+    let mut one_counts: Vec<usize> = vec![0; input_length];
 
     let num_rows = vals.len();
 

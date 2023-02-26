@@ -124,7 +124,7 @@ fn parse_input(path: &str) -> (Vec<u64>, Vec<Board>) {
     let calls: Vec<u64> = lines
         .next()
         .unwrap()
-        .split(",")
+        .split(',')
         .map(|t| t.parse::<u64>().unwrap())
         .collect();
     let mut boards = Vec::new();

@@ -22,7 +22,7 @@ fn parse(path: &str) -> State {
     let read = read_file(path).unwrap();
     let mut state = State::default();
 
-    for tok in read.split(",") {
+    for tok in read.split(',') {
         let rem: usize = tok.parse().unwrap();
         state.count[rem] += 1;
     }
