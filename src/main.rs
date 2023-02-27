@@ -8,16 +8,18 @@ use std::time::Instant;
 
 mod helpers;
 
-mod day1;
+mod day01;
+mod day02;
+mod day03;
+mod day04;
+mod day05;
+mod day06;
+mod day07;
+mod day08;
+mod day09;
 mod day10;
-mod day2;
-mod day3;
-mod day4;
-mod day5;
-mod day6;
-mod day7;
-mod day8;
-mod day9;
+mod day11;
+mod day12;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 enum Side {
@@ -58,26 +60,30 @@ fn main() -> Result<(), String> {
         let start = Instant::now();
 
         let out: String = match (a, b) {
-            (1, Side::A) => Ok(day1::a().to_string()),
-            (1, Side::B) => Ok(day1::b().to_string()),
-            (2, Side::A) => Ok(day2::a().to_string()),
-            (2, Side::B) => Ok(day2::b().to_string()),
-            (3, Side::A) => Ok(day3::a().to_string()),
-            (3, Side::B) => Ok(day3::b().to_string()),
-            (4, Side::A) => Ok(day4::a().to_string()),
-            (4, Side::B) => Ok(day4::b().to_string()),
-            (5, Side::A) => Ok(day5::a().to_string()),
-            (5, Side::B) => Ok(day5::b().to_string()),
-            (6, Side::A) => Ok(day6::a().to_string()),
-            (6, Side::B) => Ok(day6::b().to_string()),
-            (7, Side::A) => Ok(day7::a()),
-            (7, Side::B) => Ok(day7::b()),
-            (8, Side::A) => Ok(day8::a()),
-            (8, Side::B) => Ok(day8::b()),
-            (9, Side::A) => Ok(day9::a()),
-            (9, Side::B) => Ok(day9::b()),
+            (1, Side::A) => Ok(day01::a().to_string()),
+            (1, Side::B) => Ok(day01::b().to_string()),
+            (2, Side::A) => Ok(day02::a().to_string()),
+            (2, Side::B) => Ok(day02::b().to_string()),
+            (3, Side::A) => Ok(day03::a().to_string()),
+            (3, Side::B) => Ok(day03::b().to_string()),
+            (4, Side::A) => Ok(day04::a().to_string()),
+            (4, Side::B) => Ok(day04::b().to_string()),
+            (5, Side::A) => Ok(day05::a().to_string()),
+            (5, Side::B) => Ok(day05::b().to_string()),
+            (6, Side::A) => Ok(day06::a().to_string()),
+            (6, Side::B) => Ok(day06::b().to_string()),
+            (7, Side::A) => Ok(day07::a()),
+            (7, Side::B) => Ok(day07::b()),
+            (8, Side::A) => Ok(day08::a()),
+            (8, Side::B) => Ok(day08::b()),
+            (9, Side::A) => Ok(day09::a()),
+            (9, Side::B) => Ok(day09::b()),
             (10, Side::A) => Ok(day10::a()),
             (10, Side::B) => Ok(day10::b()),
+            (11, Side::A) => Ok(day11::a()),
+            (11, Side::B) => Ok(day11::b()),
+            (12, Side::A) => Ok(day12::a()),
+            (12, Side::B) => Ok(day12::b()),
             (day, side) => Err(format!("Day {}, side {} is not yet supported", day, side)),
         }?;
 

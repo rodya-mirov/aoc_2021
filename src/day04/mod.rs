@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::Read;
 
 pub fn a() -> u64 {
-    a_with_input("./src/day4/4a_full.txt")
+    a_with_input("./src/day04/4a_full.txt")
 }
 
 fn a_with_input(path: &str) -> u64 {
@@ -21,7 +21,7 @@ fn a_with_input(path: &str) -> u64 {
 }
 
 pub fn b() -> u64 {
-    b_with_input("./src/day4/4a_full.txt")
+    b_with_input("./src/day04/4a_full.txt")
 }
 
 fn b_with_input(path: &str) -> u64 {
@@ -161,7 +161,7 @@ mod tests {
     #[test]
     fn a_sample_test() {
         let expected = 4512;
-        let actual = a_with_input("./src/day4/4a_sample.txt");
+        let actual = a_with_input("./src/day04/4a_sample.txt");
 
         assert_eq!(expected, actual);
     }
@@ -169,7 +169,7 @@ mod tests {
     #[test]
     fn b_sample_test() {
         let expected = 1924;
-        let actual = b_with_input("./src/day4/4a_sample.txt");
+        let actual = b_with_input("./src/day04/4a_sample.txt");
 
         assert_eq!(expected, actual);
     }

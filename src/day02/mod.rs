@@ -3,7 +3,7 @@ use std::io::Read;
 use std::str::FromStr;
 
 pub fn a() -> u64 {
-    a_with_input("./src/day2/2a_full.txt")
+    a_with_input("./src/day02/2a_full.txt")
 }
 
 fn a_with_input(input_file: &str) -> u64 {
@@ -21,7 +21,7 @@ fn a_with_input(input_file: &str) -> u64 {
 }
 
 pub fn b() -> u64 {
-    b_with_input("./src/day2/2a_full.txt")
+    b_with_input("./src/day02/2a_full.txt")
 }
 
 fn b_with_input(input_file: &str) -> u64 {
@@ -99,7 +99,7 @@ mod tests {
     fn test_2a() {
         let expected = 150;
 
-        let actual = a_with_input("./src/day2/2a_sample.txt");
+        let actual = a_with_input("./src/day02/2a_sample.txt");
 
         assert_eq!(actual, expected);
     }
@@ -108,7 +108,7 @@ mod tests {
     fn test_2b() {
         let expected = 900;
 
-        let actual = b_with_input("./src/day2/2a_sample.txt");
+        let actual = b_with_input("./src/day02/2a_sample.txt");
 
         assert_eq!(actual, expected);
     }

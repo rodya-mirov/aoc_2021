@@ -1,11 +1,11 @@
 use crate::helpers::read_file;
 
 pub fn a() -> usize {
-    op_with_input("./src/day6/full.txt", 80)
+    op_with_input("./src/day06/full.txt", 80)
 }
 
 pub fn b() -> usize {
-    op_with_input("./src/day6/full.txt", 256)
+    op_with_input("./src/day06/full.txt", 256)
 }
 
 fn op_with_input(path: &str, days: usize) -> usize {
@@ -60,7 +60,7 @@ mod tests {
 
     #[test]
     fn a_sample_1() {
-        let actual = op_with_input("./src/day6/sample.txt", 18);
+        let actual = op_with_input("./src/day06/sample.txt", 18);
         let expected = 26;
 
         assert_eq!(actual, expected);
@@ -68,7 +68,7 @@ mod tests {
 
     #[test]
     fn a_sample_2() {
-        let actual = op_with_input("./src/day6/sample.txt", 80);
+        let actual = op_with_input("./src/day06/sample.txt", 80);
         let expected = 5934;
 
         assert_eq!(actual, expected);
@@ -76,7 +76,7 @@ mod tests {
 
     #[test]
     fn b_sample() {
-        let actual = op_with_input("./src/day6/sample.txt", 256);
+        let actual = op_with_input("./src/day06/sample.txt", 256);
         let expected = 26984457539;
 
         assert_eq!(actual, expected);

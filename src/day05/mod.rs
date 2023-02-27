@@ -4,7 +4,7 @@ use std::fs::File;
 use std::io::Read;
 
 pub fn a() -> usize {
-    a_with_input("./src/day5/full.txt")
+    a_with_input("./src/day05/full.txt")
 }
 
 fn a_with_input(input_path: &str) -> usize {
@@ -153,7 +153,7 @@ mod tests {
     #[test]
     fn sample_5a() {
         let expected = 5;
-        let actual = a_with_input("./src/day5/sample.txt");
+        let actual = a_with_input("./src/day05/sample.txt");
 
         assert_eq!(expected, actual);
     }
@@ -161,7 +161,7 @@ mod tests {
     #[test]
     fn sample_5b() {
         let expected = 12;
-        let actual = b_with_input("./src/day5/sample.txt");
+        let actual = b_with_input("./src/day05/sample.txt");
 
         assert_eq!(expected, actual);
     }
