@@ -110,7 +110,7 @@ fn parse<const W: usize, const H: usize>(input: &str) -> Grid<W, H> {
     let out: Vec<[u8; W]> = input
         .lines()
         .map(|line| {
-            let row: Vec<u8> = line.chars().map(|c| (c as u8) - ('0' as u8)).collect();
+            let row: Vec<u8> = line.chars().map(|c| (c as u8) - (b'0')).collect();
             let row: [u8; W] = row.try_into().unwrap();
             row
         })

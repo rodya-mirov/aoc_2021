@@ -1,6 +1,9 @@
 // I disagree with specific applications of this lint often enough that I'm just turning it off
 // globally
 #![allow(clippy::needless_range_loop)]
+// this lint just sucks
+#![allow(clippy::manual_range_contains)]
+#![allow(clippy::comparison_chain)]
 
 use std::env;
 use std::fmt::{Display, Formatter, Write};
@@ -20,6 +23,7 @@ mod day09;
 mod day10;
 mod day11;
 mod day12;
+mod day13;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 enum Side {
@@ -84,12 +88,14 @@ fn main() -> Result<(), String> {
             (11, Side::B) => Ok(day11::b()),
             (12, Side::A) => Ok(day12::a()),
             (12, Side::B) => Ok(day12::b()),
+            (13, Side::A) => Ok(day13::a()),
+            (13, Side::B) => Ok(day13::b()),
             (day, side) => Err(format!("Day {}, side {} is not yet supported", day, side)),
         }?;
 
         let elapsed = start.elapsed();
 
-        println!("Day {} -- {}: {}", a, b, out);
+        println!("Day {} -- {}:\n{}", a, b, out);
         println!("Took {0:3} ms", elapsed.as_secs_f32() * 1000.0);
 
         Ok(())
