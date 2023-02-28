@@ -27,7 +27,7 @@ fn a_with_input(input: &str, steps: usize) -> usize {
     }
 
     for v in counts.values_mut() {
-        *v = *v / 2;
+        *v /= 2;
     }
 
     *counts.entry(state.start).or_insert(0) += 1;
