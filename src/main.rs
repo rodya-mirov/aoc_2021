@@ -4,6 +4,7 @@
 // this lint just sucks
 #![allow(clippy::manual_range_contains)]
 #![allow(clippy::comparison_chain)]
+#![allow(clippy::bool_to_int_with_if)]
 
 use std::env;
 use std::fmt::{Display, Formatter, Write};
@@ -26,6 +27,7 @@ mod day12;
 mod day13;
 mod day14;
 mod day15;
+mod day16;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 enum Side {
@@ -96,6 +98,8 @@ fn main() -> Result<(), String> {
             (14, Side::B) => Ok(day14::b()),
             (15, Side::A) => Ok(day15::a()),
             (15, Side::B) => Ok(day15::b()),
+            (16, Side::A) => Ok(day16::a()),
+            (16, Side::B) => Ok(day16::b()),
             (day, side) => Err(format!("Day {}, side {} is not yet supported", day, side)),
         }?;
 
