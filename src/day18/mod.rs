@@ -179,8 +179,8 @@ fn try_explode(sn: SnailNum) -> (SnailNum, bool) {
         left_overflow_amt: u64,
         right_overflow_amt: u64,
     ) {
-        match sn {
-            &mut Element::Num(ref mut val_ref) => {
+        match *sn {
+            Element::Num(ref mut val_ref) => {
                 if *running_index + 1 == target_index {
                     *val_ref += left_overflow_amt;
                 } else if target_index + 1 == *running_index {
@@ -188,7 +188,7 @@ fn try_explode(sn: SnailNum) -> (SnailNum, bool) {
                 }
                 *running_index += 1;
             }
-            &mut Element::Pair(ref mut sn) => {
+            Element::Pair(ref mut sn) => {
                 let SnailNum(a, b) = sn.as_mut();
                 traverse_and_add(
                     a,
@@ -228,8 +228,8 @@ fn try_explode(sn: SnailNum) -> (SnailNum, bool) {
 
 fn try_split(sn: SnailNum) -> (SnailNum, bool) {
     fn recurse(sn: &mut Element) -> bool {
-        match sn {
-            &mut Element::Num(ref mut v) => {
+        match *sn {
+            Element::Num(ref mut v) => {
                 if *v < 10 {
                     false
                 } else {
@@ -241,7 +241,7 @@ fn try_split(sn: SnailNum) -> (SnailNum, bool) {
                     true
                 }
             }
-            &mut Element::Pair(ref mut child) => {
+            Element::Pair(ref mut child) => {
                 let &mut SnailNum(ref mut a, ref mut b) = child.as_mut();
 
                 recurse(a) || recurse(b)
@@ -291,7 +291,7 @@ fn parse(input: &str) -> SnailNum {
     }
 
     fn parse_element(input: &str) -> IResult<&str, Element> {
-        if input.chars().next().unwrap() == '[' {
+        if input.starts_with('[') {
             let (input, sn) = parse_pair(input)?;
             Ok((input, Element::Pair(Box::new(sn))))
         } else {
