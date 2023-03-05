@@ -32,6 +32,7 @@ mod day17;
 mod day18;
 mod day19;
 mod day20;
+mod day21;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 enum Side {
@@ -112,6 +113,8 @@ fn main() -> Result<(), String> {
             (19, Side::B) => Ok(day19::b()),
             (20, Side::A) => Ok(day20::a()),
             (20, Side::B) => Ok(day20::b()),
+            (21, Side::A) => Ok(day21::a()),
+            (21, Side::B) => Ok(day21::b()),
             (day, side) => Err(format!("Day {}, side {} is not yet supported", day, side)),
         }?;
 
