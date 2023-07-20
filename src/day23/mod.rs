@@ -1,4 +1,6 @@
+use std::cmp::Reverse;
 use std::collections::BinaryHeap;
+use std::collections::HashSet;
 
 fn input() -> String {
     std::fs::read_to_string("input/input_23.txt").expect("Should be able to read the file")
@@ -13,355 +15,11 @@ pub fn a() -> String {
 }
 
 const HALLWAY_WIDTH: usize = 11;
-
-#[derive(Copy, Clone, Eq, PartialEq, Debug)]
-enum Pos {
-    Hall(usize),
-    FrontRoom(usize),
-    BackRoom(usize),
-}
+const ALLOWED_HALLWAY_POSITIONS: [usize; 7] = [0, 1, 3, 5, 7, 9, 10];
 
 fn a_with_input(input: &str) -> u64 {
-    use std::cmp::Reverse;
-    use Occupant::*;
-
-    let start_state = parse(input);
-
-    // cost lower bound, cost so far, state
-    type PathsQueue = BinaryHeap<Reverse<(u64, State)>>;
-
-    let mut queue = PathsQueue::new();
-    queue.push(Reverse((heuristic_finish_cost(start_state), start_state)));
-
-    // TODO: this is too complicated and it's a typo factory
-    fn can_move(start: Pos, end: Pos, state: State) -> bool {
-        if start == end {
-            return false;
-        }
-
-        let hall_clear = |x1, x2| {
-            if x1 < x2 {
-                (x1..=x2).all(|x| state.hall[x] == Empty)
-            } else {
-                (x2..=x1).all(|x| state.hall[x] == Empty)
-            }
-        };
-
-        match start {
-            Pos::Hall(start_x) => {
-                match end {
-                    Pos::Hall(_end_x) => {
-                        unreachable!("Can't move within a hall");
-                        /* todo delete commented out code
-                        if start_x < end_x {
-                            hall_clear(start_x + 1, end_x)
-                        } else if start_x > end_x {
-                            hall_clear(end_x, start_x - 1)
-                        } else {
-                            true
-                        }
-                         */
-                    }
-                    Pos::FrontRoom(end_hall) => {
-                        let end_x = (end_hall * 2) + 2;
-                        state.front_room[end_hall] == Empty && {
-                            if start_x < end_x {
-                                hall_clear(start_x + 1, end_x)
-                            } else if start_x > end_x {
-                                hall_clear(end_x, start_x - 1)
-                            } else {
-                                unreachable!()
-                            }
-                        }
-                    }
-                    Pos::BackRoom(end_hall) => {
-                        let end_x = (end_hall * 2) + 2;
-                        state.front_room[end_hall] == Empty
-                            && state.back_room[end_hall] == Empty
-                            && {
-                                if start_x < end_x {
-                                    hall_clear(start_x + 1, end_x)
-                                } else if start_x > end_x {
-                                    hall_clear(end_x, start_x - 1)
-                                } else {
-                                    unreachable!()
-                                }
-                            }
-                    }
-                }
-            }
-            Pos::FrontRoom(start_hall) => {
-                let start_x = (start_hall * 2) + 2;
-                match end {
-                    Pos::Hall(end_x) => hall_clear(start_x, end_x),
-                    Pos::FrontRoom(end_hall) => {
-                        let end_x = (end_hall * 2) + 2;
-                        state.front_room[end_hall] == Empty && hall_clear(start_x, end_x)
-                    }
-                    Pos::BackRoom(end_hall) => {
-                        let end_x = (end_hall * 2) + 2;
-                        state.front_room[end_hall] == Empty
-                            && state.back_room[end_hall] == Empty
-                            && hall_clear(start_x, end_x)
-                    }
-                }
-            }
-            Pos::BackRoom(start_hall) => {
-                let start_x = (start_hall * 2) + 2;
-                state.front_room[start_hall] == Empty
-                    && match end {
-                        Pos::Hall(end_x) => hall_clear(start_x, end_x),
-                        Pos::FrontRoom(end_hall) => {
-                            let end_x = (end_hall * 2) + 2;
-                            state.front_room[end_hall] == Empty && hall_clear(start_x, end_x)
-                        }
-                        Pos::BackRoom(end_hall) => {
-                            let end_x = (end_hall * 2) + 2;
-                            state.front_room[end_hall] == Empty
-                                && state.back_room[end_hall] == Empty
-                                && hall_clear(start_x, end_x)
-                        }
-                    }
-            }
-        }
-    }
-
-    fn move_cost(start: Pos, end: Pos, occupant: Occupant) -> u64 {
-        let tile_cost = match occupant {
-            Empty => unreachable!(),
-            A => 1,
-            B => 10,
-            C => 100,
-            D => 1000,
-        };
-
-        let dist: usize = match end {
-            Pos::Hall(end_x) => match start {
-                Pos::Hall(start_x) => end_x.abs_diff(start_x),
-                Pos::FrontRoom(start_hall) => {
-                    let start_x = (start_hall * 2) + 2;
-                    end_x.abs_diff(start_x) + 1
-                }
-                Pos::BackRoom(start_hall) => {
-                    let start_x = (start_hall * 2) + 2;
-                    end_x.abs_diff(start_x) + 2
-                }
-            },
-            Pos::FrontRoom(end_hall) => {
-                let end_x = (end_hall * 2) + 2;
-                match start {
-                    Pos::Hall(start_x) => end_x.abs_diff(start_x) + 1,
-                    Pos::FrontRoom(start_hall) => {
-                        if start_hall == end_hall {
-                            0
-                        } else {
-                            let start_x = (start_hall * 2) + 2;
-                            end_x.abs_diff(start_x) + 2
-                        }
-                    }
-                    Pos::BackRoom(start_hall) => {
-                        if start_hall == end_hall {
-                            1
-                        } else {
-                            let start_x = (start_hall * 2) + 2;
-                            end_x.abs_diff(start_x) + 3
-                        }
-                    }
-                }
-            }
-            Pos::BackRoom(end_hall) => {
-                let end_x = (end_hall * 2) + 2;
-                match start {
-                    Pos::Hall(start_x) => end_x.abs_diff(start_x) + 2,
-                    Pos::FrontRoom(start_hall) => {
-                        if start_hall == end_hall {
-                            1
-                        } else {
-                            let start_x = (start_hall * 2) + 2;
-                            end_x.abs_diff(start_x) + 3
-                        }
-                    }
-                    Pos::BackRoom(start_hall) => {
-                        if start_hall == end_hall {
-                            0
-                        } else {
-                            let start_x = (start_hall * 2) + 2;
-                            end_x.abs_diff(start_x) + 4
-                        }
-                    }
-                }
-            }
-        };
-
-        tile_cost * (dist as u64)
-    }
-
-    #[inline(always)]
-    fn desired_hall(occupant: Occupant) -> Option<usize> {
-        match occupant {
-            Empty => None,
-            A => Some(0),
-            B => Some(1),
-            C => Some(2),
-            D => Some(3),
-        }
-    }
-
-    'mainloop: while let Some(Reverse((_, state))) = queue.pop() {
-        if state.is_complete() {
-            return state.cost_so_far;
-        }
-
-        // println!("Examining state {:?}", state);
-
-        // for each thing that _can_ move, iterate through their possible moves and enqueue them
-
-        // if an anthropod can move into a final room, it is always optimal to do so, so let's
-        // check that first
-        for x in 0..HALLWAY_WIDTH {
-            let occupant = state.hall[x];
-            if let Some(goal_column) = desired_hall(occupant) {
-                let start = Pos::Hall(x);
-
-                if can_move(start, Pos::BackRoom(goal_column), state) {
-                    let cost = move_cost(start, Pos::BackRoom(goal_column), occupant);
-                    let mut new_state = state.clone();
-                    new_state.hall[x] = Empty;
-                    new_state.back_room[goal_column] = occupant;
-                    new_state.cost_so_far += cost;
-
-                    let h = heuristic_finish_cost(new_state);
-                    queue.push(Reverse((h, new_state)));
-
-                    assert!(h >= state.cost_so_far);
-                    assert_eq!(new_state.occupancy(), 8);
-
-                    /* todo delete block
-                    println!("Given state {:?}", state);
-                    println!(
-                        "  Moved {:?} from hall {} into back room {:?} which is optimal",
-                        occupant, x, goal_column
-                    );
-                    println!("  Resulting state: {:?}", new_state);
-                    */
-
-                    continue 'mainloop;
-                } else if state.back_room[goal_column] == occupant
-                    && can_move(start, Pos::FrontRoom(goal_column), state)
-                {
-                    let cost = move_cost(start, Pos::FrontRoom(goal_column), occupant);
-                    let mut new_state = state.clone();
-                    new_state.hall[x] = Empty;
-                    new_state.front_room[goal_column] = occupant;
-                    new_state.cost_so_far += cost;
-
-                    let h = heuristic_finish_cost(new_state);
-                    queue.push(Reverse((h, new_state)));
-
-                    assert!(h >= state.cost_so_far);
-                    assert_eq!(new_state.occupancy(), 8);
-
-                    /* todo delete block
-                    println!("Given state {:?}", state);
-                    println!(
-                        "  Moved {:?} from hall {} into front room {:?} which is optimal",
-                        occupant, x, goal_column
-                    );
-                    println!("  Resulting state: {:?}", new_state);
-                    */
-
-                    continue 'mainloop;
-                }
-
-                // otherwise, it's already in the hallway and it's not allowed to move until
-                // it goes into its room, that's rule 3. So we consider more normal movements
-            }
-        }
-
-        // now the only options are to move an arthopod from a room into the hallway, and
-        // we can't short-circuit
-
-        for hall in 0..4 {
-            let start = {
-                let front = state.front_room[hall];
-                if front != Empty {
-                    if desired_hall(front).unwrap() != hall
-                        || desired_hall(state.back_room[hall]) != Some(hall)
-                    {
-                        Some((Pos::FrontRoom(hall), front))
-                    } else {
-                        None
-                    }
-                } else {
-                    let back = state.back_room[hall];
-                    if back != Empty && desired_hall(back).unwrap() != hall {
-                        Some((Pos::BackRoom(hall), back))
-                    } else {
-                        None
-                    }
-                }
-            };
-
-            if let Some((start_pos, occupant)) = start {
-                // can't sit in front of a door (2, 4, 6, 8) due to Rule
-                for x in [0, 1, 3, 5, 7, 9, 10] {
-                    let end_pos = Pos::Hall(x);
-                    if can_move(start_pos, end_pos, state) {
-                        let addl_cost = move_cost(start_pos, end_pos, occupant);
-                        let mut new_state = state.clone();
-                        new_state.cost_so_far += addl_cost;
-                        new_state.hall[x] = occupant;
-                        match start_pos {
-                            Pos::Hall(_) => unreachable!("prevented by code"),
-                            Pos::FrontRoom(_) => new_state.front_room[hall] = Empty,
-                            Pos::BackRoom(_) => new_state.back_room[hall] = Empty,
-                        }
-                        let est_cost = heuristic_finish_cost(new_state);
-
-                        assert!(est_cost >= state.cost_so_far);
-                        if new_state.occupancy() != 8 {
-                            println!("Old state: {:?}", state);
-                            println!("New state: {:?}", new_state);
-                            println!("Moved {:?} from {:?} to {:?}", occupant, start_pos, end_pos);
-                            assert_eq!(new_state.occupancy(), 8);
-                        }
-                        assert_eq!(new_state.occupancy(), 8);
-
-                        /* todo delete block
-                        println!(
-                            "Trying to move {:?} from {:?} to {:?} (running cost {})",
-                            occupant, start_pos, end_pos, new_state.cost_so_far
-                        );
-                        if occupant == C
-                            && start_pos == Pos::FrontRoom(1)
-                            && end_pos == Pos::Hall(5)
-                        {
-                            println!("  Original state {:#?}", state);
-                            println!("  Resulting state {:#?}", new_state);
-                            println!(
-                                "  Can (now) move to front_room[2]: {}",
-                                can_move(end_pos, Pos::FrontRoom(2), new_state)
-                            );
-                        }
-
-                         */
-                        queue.push(Reverse((est_cost, new_state)));
-                    }
-                }
-            }
-        }
-    }
-
-    panic!("No solution found")
-}
-
-/// Heuristic for the MINIMUM cost required to finish this state.
-/// It is not important for this to be completely accurate, however, if this returns a certain
-/// number, then the true number should be that estimate OR ABOVE. Algorithms depend on this to
-/// function correctly.
-fn heuristic_finish_cost(state: State) -> u64 {
-    // TODO PERF: probably worth improving this
-    state.cost_so_far
+    let state: State<2> = parse(input);
+    best_cost(state)
 }
 
 pub fn b() -> String {
@@ -373,37 +31,117 @@ pub fn b() -> String {
 }
 
 fn b_with_input(input: &str) -> u64 {
-    unimplemented!()
+    let state: State<2> = parse(input);
+    let state: State<4> = state.unfold();
+    best_cost(state)
 }
 
-#[derive(Copy, Clone, Eq, Debug, PartialEq, Hash, PartialOrd, Ord)]
-struct State {
-    hall: [Occupant; 11],
-    front_room: [Occupant; 4],
-    back_room: [Occupant; 4],
-    cost_so_far: u64,
-}
+fn best_cost<const N: usize>(start_state: State<N>) -> u64 {
+    let mut to_process: BinaryHeap<Reverse<(u64, State<N>)>> = BinaryHeap::new();
+    let mut seen: HashSet<State<N>> = HashSet::new();
 
-impl State {
-    #[inline]
-    fn is_complete(self) -> bool {
-        use Occupant::*;
+    to_process.push(Reverse((0, start_state)));
 
-        self.front_room == [A, B, C, D] && self.back_room == [A, B, C, D]
+    let mut buffer: Vec<(u64, State<N>)> = Vec::new();
+
+    while let Some(Reverse((cost, next_state))) = to_process.pop() {
+        // we iterate in lowest-cost-first order, so if we've seen a configuration before, this
+        // is not optimal
+        if !seen.insert(next_state) {
+            continue;
+        }
+
+        if next_state.is_complete() {
+            return cost;
+        }
+
+        buffer.clear();
+        set_neighbors(next_state, &mut buffer);
+
+        for (addl_cost, new_state) in buffer.iter().copied() {
+            to_process.push(Reverse((addl_cost + cost, new_state)));
+        }
     }
 
-    fn occupancy(self) -> usize {
-        self.hall.iter().filter(|&&c| c != Occupant::Empty).count()
-            + self
-                .front_room
-                .iter()
-                .filter(|&&c| c != Occupant::Empty)
-                .count()
-            + self
-                .back_room
-                .iter()
-                .filter(|&&c| c != Occupant::Empty)
-                .count()
+    panic!("No solution found")
+}
+
+enum Position {
+    // position in the hallways
+    Hallway(usize),
+    // position in a room; this is (room_idx, room_pos); so room_idx=0 is left, and room_pos=0 is front
+    Room(usize, usize),
+}
+
+/// For each state accessible from this state, adds an element to the buffer which is
+/// of the form (additional_cost, state_after_move)
+fn set_neighbors<const N: usize>(state: State<N>, buffer: &mut Vec<(u64, State<N>)>) {
+    let rooms_available = [
+        state.room_ready(0),
+        state.room_ready(1),
+        state.room_ready(2),
+        state.room_ready(3),
+    ];
+
+    // first, check for dudes in the hallway
+    for hallway_pos in 0..HALLWAY_WIDTH {
+        let occ = state.hall[hallway_pos];
+        if occ != Occupant::Empty {
+            let desired_room = occ.desired_room();
+            if rooms_available[desired_room] {
+                let room = state.rooms[desired_room];
+                let goal_room_pos = (0..N)
+                    .filter(|&room_pos| room.occupants[room_pos] == Occupant::Empty)
+                    .last()
+                    .expect("If the room is ready there should be a spot in it");
+                let start_pos = Position::Hallway(hallway_pos);
+                let goal_pos = Position::Room(desired_room, goal_room_pos);
+
+                if let Some(dist) = state.path_length(start_pos, goal_pos) {
+                    let tile_cost = occ.per_tile_cost();
+                    let addl_cost = dist * tile_cost;
+                    let mut new_state = state.clone();
+                    std::mem::swap(
+                        &mut new_state.hall[hallway_pos],
+                        &mut new_state.rooms[desired_room].occupants[goal_room_pos],
+                    );
+                    buffer.push((addl_cost, new_state));
+                }
+            }
+        }
+    }
+
+    // then check moves into the hallway
+    for room_idx in 0..4 {
+        // never need to move anybody out of a room that's already "done"
+        if rooms_available[room_idx] {
+            continue;
+        }
+
+        let room = state.rooms[room_idx];
+
+        if let Some(room_pos) = (0..N)
+            .filter(|&room_pos| room.occupants[room_pos] != Occupant::Empty)
+            .next()
+        {
+            let occ = room.occupants[room_pos];
+
+            for hallway_pos in ALLOWED_HALLWAY_POSITIONS.iter().copied() {
+                let start_pos = Position::Room(room_idx, room_pos);
+                let goal_pos = Position::Hallway(hallway_pos);
+
+                if let Some(dist) = state.path_length(start_pos, goal_pos) {
+                    let tile_cost = occ.per_tile_cost();
+                    let addl_cost = dist * tile_cost;
+                    let mut new_state = state.clone();
+                    std::mem::swap(
+                        &mut new_state.hall[hallway_pos],
+                        &mut new_state.rooms[room_idx].occupants[room_pos],
+                    );
+                    buffer.push((addl_cost, new_state));
+                }
+            }
+        }
     }
 }
 
@@ -416,7 +154,185 @@ enum Occupant {
     D,
 }
 
-fn parse(input: &str) -> State {
+impl Occupant {
+    #[inline(always)]
+    fn per_tile_cost(self) -> u64 {
+        match self {
+            Occupant::A => 1,
+            Occupant::B => 10,
+            Occupant::C => 100,
+            Occupant::D => 1000,
+            Occupant::Empty => panic!("Illegal argument, don't be zero"),
+        }
+    }
+
+    #[inline(always)]
+    fn desired_room(self) -> usize {
+        match self {
+            Occupant::A => 0,
+            Occupant::B => 1,
+            Occupant::C => 2,
+            Occupant::D => 3,
+            Occupant::Empty => panic!("Illegal argument, don't be zero"),
+        }
+    }
+}
+
+impl Default for Occupant {
+    fn default() -> Self {
+        Occupant::Empty
+    }
+}
+
+#[derive(Copy, Clone, Eq, Debug, PartialEq, Hash, PartialOrd, Ord, Default)]
+struct State<const N: usize> {
+    // keep "cost so far" at the top so that sort is defined primarily by cost
+    cost_so_far: u64,
+    hall: [Occupant; HALLWAY_WIDTH],
+    rooms: [Room<N>; 4],
+}
+
+#[derive(Copy, Clone, Eq, Debug, PartialEq, Hash, PartialOrd, Ord)]
+struct Room<const N: usize> {
+    // 0 is the front, 1 is next, etc. to the back
+    occupants: [Occupant; N],
+}
+
+impl<const N: usize> Room<N> {
+    #[inline(always)]
+    fn matches_goal(self, target: Occupant) -> bool {
+        self.occupants
+            .iter()
+            .copied()
+            .all(|c| c == Occupant::Empty || c == target)
+    }
+}
+
+impl State<2> {
+    fn unfold(self: State<2>) -> State<4> {
+        let mut out: State<4> = State::default();
+
+        for room_idx in 0..4 {
+            out.rooms[room_idx].occupants[0] = self.rooms[room_idx].occupants[0];
+            out.rooms[room_idx].occupants[3] = self.rooms[room_idx].occupants[1];
+        }
+
+        out.rooms[0].occupants[1] = Occupant::D;
+        out.rooms[0].occupants[2] = Occupant::D;
+
+        out.rooms[1].occupants[1] = Occupant::C;
+        out.rooms[1].occupants[2] = Occupant::B;
+
+        out.rooms[2].occupants[1] = Occupant::B;
+        out.rooms[2].occupants[2] = Occupant::A;
+
+        out.rooms[3].occupants[1] = Occupant::A;
+        out.rooms[3].occupants[2] = Occupant::C;
+
+        out
+    }
+}
+
+impl<const N: usize> Default for Room<N> {
+    fn default() -> Self {
+        Self {
+            occupants: [Occupant::default(); N],
+        }
+    }
+}
+
+impl<const N: usize> State<N> {
+    #[inline]
+    fn is_complete(self) -> bool {
+        use Occupant::*;
+
+        self.rooms[0].occupants == [A; N]
+            && self.rooms[1].occupants == [B; N]
+            && self.rooms[2].occupants == [C; N]
+            && self.rooms[3].occupants == [D; N]
+    }
+
+    /// Whether the room at [room_idx] is ready for people to move in, instead of out
+    fn room_ready(self, room_idx: usize) -> bool {
+        let goal: Occupant = match room_idx {
+            0 => Occupant::A,
+            1 => Occupant::B,
+            2 => Occupant::C,
+            3 => Occupant::D,
+            _ => panic!("Rooms must be 0, 1, 2, or 3"),
+        };
+
+        self.rooms[room_idx].matches_goal(goal)
+    }
+
+    // Returns the number of tiles moved, if it's possible; or else returns None
+    fn path_length(&self, start: Position, end: Position) -> Option<u64> {
+        match start {
+            Position::Hallway(s_hallway) => match end {
+                Position::Room(e_room_idx, e_room_pos) => {
+                    let e_room = self.rooms[e_room_idx];
+
+                    if (0..=e_room_pos).any(|r| e_room.occupants[r] != Occupant::Empty) {
+                        return None;
+                    }
+
+                    let room_dist = e_room_pos + 1;
+                    let e_hallway = e_room_idx * 2 + 2;
+
+                    let (min_hall, max_hall) = if e_hallway < s_hallway {
+                        (e_hallway, s_hallway - 1)
+                    } else {
+                        (s_hallway + 1, e_hallway)
+                    };
+
+                    let hall_dist = max_hall - min_hall;
+
+                    if (min_hall..=max_hall).any(|r| self.hall[r] != Occupant::Empty) {
+                        return None;
+                    }
+
+                    return Some((room_dist + hall_dist) as u64);
+                }
+                Position::Hallway(_) => {
+                    panic!("I don't think we need this?")
+                }
+            },
+            Position::Room(s_room_idx, s_room_pos) => {
+                let start_room = self.rooms[s_room_idx];
+
+                match end {
+                    Position::Hallway(e_hallway) => {
+                        if (0..s_room_pos)
+                            .any(|room_pos| start_room.occupants[room_pos] != Occupant::Empty)
+                        {
+                            return None;
+                        }
+
+                        // distance from your room spot out into the hall
+                        let room_dist = s_room_pos + 1;
+
+                        // this is the spot out in the hall; now we need to check the entire hall
+                        // is clear
+                        let s_hallway = s_room_idx * 2 + 2;
+                        let min = e_hallway.min(s_hallway);
+                        let max = e_hallway.max(s_hallway);
+
+                        return if (min..=max).all(|r| self.hall[r] == Occupant::Empty) {
+                            Some((room_dist + max - min) as u64)
+                        } else {
+                            None
+                        };
+                    }
+                    Position::Room(_, _) => {
+                        panic!("I don't think we need this?")
+                    }
+                }
+            }
+        }
+    }
+}
+
+fn parse(input: &str) -> State<2> {
     fn parse_char(c: Option<char>) -> Occupant {
         match c {
             Some('A') => Occupant::A,
@@ -427,59 +343,46 @@ fn parse(input: &str) -> State {
         }
     }
 
+    let mut out: State<2> = State::default();
+
     let mut lines = input.lines();
 
     // making sure the sizes here aren't dynamic because the code expects this exactly
     assert_eq!(lines.next(), Some("#############"));
     assert_eq!(lines.next(), Some("#...........#"));
 
-    // line 3
-    let line = lines.next().unwrap();
-    let mut line_chars = line.chars();
-    assert_eq!(line_chars.next(), Some('#'));
-    assert_eq!(line_chars.next(), Some('#'));
-    assert_eq!(line_chars.next(), Some('#'));
-    let o1 = parse_char(line_chars.next());
-    assert_eq!(line_chars.next(), Some('#'));
-    let o2 = parse_char(line_chars.next());
-    assert_eq!(line_chars.next(), Some('#'));
-    let o3 = parse_char(line_chars.next());
-    assert_eq!(line_chars.next(), Some('#'));
-    let o4 = parse_char(line_chars.next());
-    assert_eq!(line_chars.next(), Some('#'));
-    assert_eq!(line_chars.next(), Some('#'));
-    assert_eq!(line_chars.next(), Some('#'));
-    assert_eq!(line_chars.next(), None);
+    // line 3 + 4
+    for room_pos in 0..2 {
+        let line = lines.next().unwrap();
+        let mut line_chars = line.chars();
 
-    let front_room = [o1, o2, o3, o4];
+        if room_pos == 0 {
+            assert_eq!(line_chars.next(), Some('#'));
+            assert_eq!(line_chars.next(), Some('#'));
+        } else {
+            assert_eq!(line_chars.next(), Some(' '));
+            assert_eq!(line_chars.next(), Some(' '));
+        }
+        assert_eq!(line_chars.next(), Some('#'));
 
-    // line 4
-    let line = lines.next().unwrap();
-    let mut line_chars = line.chars();
-    assert_eq!(line_chars.next(), Some(' '));
-    assert_eq!(line_chars.next(), Some(' '));
-    assert_eq!(line_chars.next(), Some('#'));
-    let o1 = parse_char(line_chars.next());
-    assert_eq!(line_chars.next(), Some('#'));
-    let o2 = parse_char(line_chars.next());
-    assert_eq!(line_chars.next(), Some('#'));
-    let o3 = parse_char(line_chars.next());
-    assert_eq!(line_chars.next(), Some('#'));
-    let o4 = parse_char(line_chars.next());
-    assert_eq!(line_chars.next(), Some('#'));
-    assert_eq!(line_chars.next(), None);
+        for room_idx in 0..4 {
+            out.rooms[room_idx].occupants[room_pos] = parse_char(line_chars.next());
 
-    let back_room = [o1, o2, o3, o4];
+            assert_eq!(line_chars.next(), Some('#'));
+        }
+
+        if room_pos == 0 {
+            assert_eq!(line_chars.next(), Some('#'));
+            assert_eq!(line_chars.next(), Some('#'));
+        }
+
+        assert_eq!(line_chars.next(), None);
+    }
 
     assert_eq!(lines.next(), Some("  #########"));
     assert_eq!(lines.next(), None);
 
-    State {
-        hall: [Occupant::Empty; 11],
-        front_room,
-        back_room,
-        cost_so_far: 0,
-    }
+    out
 }
 
 #[cfg(test)]
@@ -511,9 +414,13 @@ mod tests {
         let actual = parse(SAMPLE);
 
         let expected = State {
-            hall: [Empty; 11],
-            front_room: [B, C, B, D],
-            back_room: [A, D, C, A],
+            hall: [Empty; HALLWAY_WIDTH],
+            rooms: [
+                Room { occupants: [B, A] },
+                Room { occupants: [C, D] },
+                Room { occupants: [B, C] },
+                Room { occupants: [D, A] },
+            ],
             cost_so_far: 0,
         };
 
@@ -530,6 +437,7 @@ mod tests {
 
     #[test]
     fn sample_a_2() {
+        // todo: add some unit tests for path cost
         let actual = a_with_input(EASY_SAMPLE);
         let expected = 460;
 
