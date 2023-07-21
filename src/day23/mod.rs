@@ -186,8 +186,6 @@ impl Default for Occupant {
 
 #[derive(Copy, Clone, Eq, Debug, PartialEq, Hash, PartialOrd, Ord, Default)]
 struct State<const N: usize> {
-    // keep "cost so far" at the top so that sort is defined primarily by cost
-    cost_so_far: u64,
     hall: [Occupant; HALLWAY_WIDTH],
     rooms: [Room<N>; 4],
 }
@@ -285,7 +283,7 @@ impl<const N: usize> State<N> {
                         (s_hallway + 1, e_hallway)
                     };
 
-                    let hall_dist = max_hall - min_hall;
+                    let hall_dist = max_hall - min_hall + 1;
 
                     if (min_hall..=max_hall).any(|r| self.hall[r] != Occupant::Empty) {
                         return None;
@@ -388,6 +386,7 @@ fn parse(input: &str) -> State<2> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::day23::Position::Hallway;
 
     const TRIVIAL_SAMPLE: &'static str = "#############
 #...........#
@@ -421,7 +420,6 @@ mod tests {
                 Room { occupants: [B, C] },
                 Room { occupants: [D, A] },
             ],
-            cost_so_far: 0,
         };
 
         assert_eq!(actual, expected)
@@ -433,6 +431,44 @@ mod tests {
         let expected = 0;
 
         assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn path_cost_test_1() {
+        let state = parse(SAMPLE);
+
+        let length = state.path_length(Position::Room(2, 0), Hallway(3));
+
+        assert_eq!(length, Some(4));
+    }
+
+    #[test]
+    fn path_cost_test_1rev() {
+        let state = parse(SAMPLE);
+
+        let length = state.path_length(Hallway(3), Position::Room(2, 0));
+
+        assert_eq!(length, None);
+    }
+
+    #[test]
+    fn path_cost_test_1rev_fixed() {
+        let mut state = parse(SAMPLE);
+
+        std::mem::swap(&mut state.hall[3], &mut state.rooms[2].occupants[0]);
+
+        let length = state.path_length(Hallway(3), Position::Room(2, 0));
+
+        assert_eq!(length, Some(4));
+    }
+
+    #[test]
+    fn path_cost_test_2() {
+        let state = parse(SAMPLE);
+
+        let length = state.path_length(Position::Room(0, 0), Hallway(3));
+
+        assert_eq!(length, Some(2));
     }
 
     #[test]
@@ -455,7 +491,7 @@ mod tests {
     #[test]
     fn sample_b() {
         let actual = b_with_input(SAMPLE);
-        let expected = 2758514936282235;
+        let expected = 44169;
 
         assert_eq!(expected, actual);
     }
