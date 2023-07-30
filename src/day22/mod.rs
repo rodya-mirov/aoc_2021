@@ -32,13 +32,7 @@ fn a_with_input(input: &str) -> usize {
         zmax,
     } in lines.iter().copied()
     {
-        if xmin > MAX_COORD
-            || ymin > MAX_COORD
-            || zmin > MAX_COORD
-            || xmax < MIN_COORD
-            || ymax < MIN_COORD
-            || zmax < MIN_COORD
-        {
+        if xmin > MAX_COORD || ymin > MAX_COORD || zmin > MAX_COORD || xmax < MIN_COORD || ymax < MIN_COORD || zmax < MIN_COORD {
             continue;
         }
 
@@ -152,14 +146,7 @@ fn one_axis_a_contains_b(a_min: i32, a_max: i32, b_min: i32, b_max: i32) -> bool
 }
 
 impl FilledBox {
-    fn maybe_new(
-        xmin: i32,
-        xmax: i32,
-        ymin: i32,
-        ymax: i32,
-        zmin: i32,
-        zmax: i32,
-    ) -> Option<FilledBox> {
+    fn maybe_new(xmin: i32, xmax: i32, ymin: i32, ymax: i32, zmin: i32, zmax: i32) -> Option<FilledBox> {
         if xmin > xmax || ymin > ymax || zmin > zmax {
             None
         } else {
@@ -222,51 +209,19 @@ impl FilledBox {
         let xmin = i32::max(self.xmin, other.xmin);
         let xmax = i32::min(self.xmax, other.xmax);
 
-        let low_y = FilledBox::maybe_new(
-            xmin,
-            xmax,
-            self.ymin,
-            i32::min(self.ymax, other.ymin - 1),
-            self.zmin,
-            self.zmax,
-        );
+        let low_y = FilledBox::maybe_new(xmin, xmax, self.ymin, i32::min(self.ymax, other.ymin - 1), self.zmin, self.zmax);
 
-        let high_y = FilledBox::maybe_new(
-            xmin,
-            xmax,
-            i32::max(self.ymin, other.ymax + 1),
-            self.ymax,
-            self.zmin,
-            self.zmax,
-        );
+        let high_y = FilledBox::maybe_new(xmin, xmax, i32::max(self.ymin, other.ymax + 1), self.ymax, self.zmin, self.zmax);
 
         // the rest will be in the y-intersection of the two cubes
         let ymin = i32::max(self.ymin, other.ymin);
         let ymax = i32::min(self.ymax, other.ymax);
 
-        let low_z = FilledBox::maybe_new(
-            xmin,
-            xmax,
-            ymin,
-            ymax,
-            self.zmin,
-            i32::min(self.zmax, other.zmin - 1),
-        );
+        let low_z = FilledBox::maybe_new(xmin, xmax, ymin, ymax, self.zmin, i32::min(self.zmax, other.zmin - 1));
 
-        let high_z = FilledBox::maybe_new(
-            xmin,
-            xmax,
-            ymin,
-            ymax,
-            i32::max(self.zmin, other.zmax + 1),
-            self.zmax,
-        );
+        let high_z = FilledBox::maybe_new(xmin, xmax, ymin, ymax, i32::max(self.zmin, other.zmax + 1), self.zmax);
 
-        [low_x, high_x, low_y, high_y, low_z, high_z]
-            .iter()
-            .copied()
-            .flatten()
-            .collect()
+        [low_x, high_x, low_y, high_y, low_z, high_z].iter().copied().flatten().collect()
     }
 }
 

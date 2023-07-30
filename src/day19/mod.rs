@@ -85,9 +85,7 @@ fn map_the_ocean(mut sensor_data: Vec<Vec<Pos>>) -> MappingResult {
                                 //       are likely to line up, but that seems hard?
                                 let cand_rotated: Vec<Pos> = candidate
                                     .iter()
-                                    .map(|p| {
-                                        [x_sign * p[x_axis], y_sign * p[y_axis], z_sign * p[z_axis]]
-                                    })
+                                    .map(|p| [x_sign * p[x_axis], y_sign * p[y_axis], z_sign * p[z_axis]])
                                     .collect();
 
                                 // now that we picked a rotation, we still need alignment of at least 12 beacons
@@ -111,9 +109,7 @@ fn map_the_ocean(mut sensor_data: Vec<Vec<Pos>>) -> MappingResult {
                                         let found = base
                                             .iter()
                                             .copied()
-                                            .filter(|p| {
-                                                cand_rotated.contains(&sub(*p, translation))
-                                            })
+                                            .filter(|p| cand_rotated.contains(&sub(*p, translation)))
                                             .count();
 
                                         if found >= ALIGNMENT_THRESHOLD {
@@ -174,11 +170,7 @@ fn map_the_ocean(mut sensor_data: Vec<Vec<Pos>>) -> MappingResult {
 
                 let translation = transform.translate;
                 sensor_positions[cand_idx] = Some(translation);
-                println!(
-                    "    Sensor {} is at {:?}",
-                    cand_idx,
-                    sensor_positions[cand_idx].unwrap()
-                )
+                println!("    Sensor {} is at {:?}", cand_idx, sensor_positions[cand_idx].unwrap())
             }
         }
     }
@@ -234,10 +226,7 @@ fn parse(input: &str) -> Vec<Vec<Pos>> {
                 current_sensor = Vec::new();
             }
         } else {
-            let coords: Vec<i32> = line
-                .split(',')
-                .map(|tok| tok.parse::<i32>().unwrap())
-                .collect();
+            let coords: Vec<i32> = line.split(',').map(|tok| tok.parse::<i32>().unwrap()).collect();
             assert_eq!(coords.len(), 3, "Positions should have 3 dimensions");
             let pos = [coords[0], coords[1], coords[2]];
             current_sensor.push(pos);

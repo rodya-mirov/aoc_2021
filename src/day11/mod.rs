@@ -45,16 +45,7 @@ fn iterate<const W: usize, const H: usize>(state: &mut [[u8; W]; H]) -> u64 {
         did_flash[y][x] = true;
         total_flashes += 1;
 
-        let diffs: [(isize, isize); 8] = [
-            (-1, -1),
-            (-1, 0),
-            (-1, 1),
-            (0, -1),
-            (0, 1),
-            (1, -1),
-            (1, 0),
-            (1, 1),
-        ];
+        let diffs: [(isize, isize); 8] = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)];
 
         for (dx, dy) in diffs {
             let xp = (x as isize) + dx;

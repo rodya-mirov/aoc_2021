@@ -117,11 +117,7 @@ fn b_with_input(input: &str) -> usize {
 fn parse_input(input: &str) -> Vec<Vec<u32>> {
     input
         .lines()
-        .map(|line| {
-            line.chars()
-                .map(|c| (c as u32) - ('0' as u32))
-                .collect::<Vec<u32>>()
-        })
+        .map(|line| line.chars().map(|c| (c as u32) - ('0' as u32)).collect::<Vec<u32>>())
         .collect()
 }
 

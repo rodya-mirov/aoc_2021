@@ -17,11 +17,7 @@ pub fn a() -> String {
 fn a_with_input(input: &str) -> CostType {
     let grid: Vec<Vec<_>> = input
         .lines()
-        .map(|line| {
-            line.chars()
-                .map(|c| (c as CostType) - ('0' as CostType))
-                .collect::<Vec<_>>()
-        })
+        .map(|line| line.chars().map(|c| (c as CostType) - ('0' as CostType)).collect::<Vec<_>>())
         .collect();
 
     solve_grid(&grid)
@@ -116,11 +112,7 @@ pub fn b() -> String {
 fn b_with_input(input: &str) -> CostType {
     let small_grid: Vec<Vec<_>> = input
         .lines()
-        .map(|line| {
-            line.chars()
-                .map(|c| (c as CostType) - ('0' as CostType))
-                .collect::<Vec<_>>()
-        })
+        .map(|line| line.chars().map(|c| (c as CostType) - ('0' as CostType)).collect::<Vec<_>>())
         .collect();
 
     let w = small_grid[0].len();

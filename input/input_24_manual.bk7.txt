@@ -1,0 +1,232 @@
+inp w   W0
+z = W0+2
+
+inp w   W1
+z = (W0 + 2) * 26 + W1+4
+
+inp w   W2
+z = (((W0 + 2) * 26 + (W1 + 4)) * 26) + (W2 + 8)
+
+inp w   W3
+z = (((((W0 + 2) * 26 + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)
+
+inp w   W4
+z = (((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W4 + 12))
+
+inp w   W5
+z = IF (((W4+12)-14) == W5)
+    THEN (((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7))
+    ELSE ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W5 + 7)
+
+inp w   W6
+z = IF
+        ((((W4 + 12) + -14) == W5))
+    THEN
+        IF
+            (W3 + 7) == W6
+        THEN
+            ((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)
+        ELSE
+            ((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W6 + 10)
+    ELSE
+        IF
+            (W5 + 7) == W6
+        THEN
+            ((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)
+        ELSE
+            ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W6 + 10)
+
+
+inp w   W7
+# after steps 7:1 through 7:4, which is basically "set x (z%26)"
+x: (IF ((((W4 + 12) + -14) == W5)) THEN ((IF (((W3 + 7) == W6)) THEN ((W2 + 8)) ELSE ((W6 + 10)))) ELSE ((IF (((W5 + 7) == W6)) THEN ((W3 + 7)) ELSE ((W6 + 10)))))
+x = IF
+        ((((W4 + 12) + -14) == W5))
+    THEN
+        IF
+            (W3 + 7) == W6
+        THEN
+            W2 + 8
+        ELSE
+            W6 + 10
+    ELSE
+        IF
+            (W5 + 7) == W6
+        THEN
+            W3 + 7
+        ELSE
+            W6 + 10
+
+# step 7:5 is a no-op (div z 1)
+# after step 7:6 which is basically "set x (z%26)+10"
+x = IF
+        ((((W4 + 12) + -14) == W5))
+    THEN
+        IF
+            (W3 + 7) == W6
+        THEN
+            W2 + 8+10
+        ELSE
+            W6 + 10+10
+    ELSE
+        IF
+            (W5 + 7) == W6
+        THEN
+            W3 + 7+10
+        ELSE
+            W6 + 10+10
+
+# because of bounds, step 7:7 is const (0) because x>= 10 > w, so step 7:8 is set x 1
+x = 1
+
+# then step 7:9 through 7:12 (mul y 0, add y 25, mul y x, add y 1) collapse to "set y 26"
+y = 26
+
+# so step 7:13 (mul z y) is just mul z 26
+z = IF
+        ((((W4 + 12) + -14) == W5))
+    THEN
+        IF
+            (W3 + 7) == W6
+        THEN
+            (((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26
+        ELSE
+            (((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W6 + 10)) * 26
+    ELSE
+        IF
+            (W5 + 7) == W6
+        THEN
+            (((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26
+        ELSE
+            (((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W6 + 10)) * 26
+
+# then steps 7:14 through 7:17 (mul y 0, add y w, add y 14, mul y x), since x=1 are just "set y (W7+14)"
+y = W7 + 14
+
+# so we end up with 7:18 (add z y) is just
+z: (IF ((((W4 + 12) + -14) == W5)) THEN ((IF (((W3 + 7) == W6)) THEN ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W7 + 14))) ELSE ((((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W6 + 10)) * 26) + (W7 + 14))))) ELSE ((IF (((W5 + 7) == W6)) THEN ((((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W7 + 14))) ELSE ((((((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W6 + 10)) * 26) + (W7 + 14))))))
+z = IF
+        ((((W4 + 12) + -14) == W5))
+    THEN
+        IF
+            (W3 + 7) == W6
+        THEN
+            ((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W7 + 14)
+        ELSE
+            ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W6 + 10)) * 26) + (W7 + 14)
+    ELSE
+        IF
+            (W5 + 7) == W6
+        THEN
+            ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W7 + 14)
+        ELSE
+            ((((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W6 + 10)) * 26) + (W7 + 14)
+
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -10
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 2
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 13
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 6
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -12
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 8
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -3
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 11
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -11
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 5
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -2
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 11
+mul y x
+add z y

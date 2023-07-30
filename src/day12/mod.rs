@@ -129,13 +129,7 @@ fn b_with_input(input: &str) -> usize {
 
     let mut path_count = 0;
 
-    fn recurse(
-        current_index: usize,
-        pr: &ParseResult,
-        visited: &mut [bool],
-        has_doubled: bool,
-        counter: &mut usize,
-    ) {
+    fn recurse(current_index: usize, pr: &ParseResult, visited: &mut [bool], has_doubled: bool, counter: &mut usize) {
         for target_node in pr.edges[current_index].iter().copied() {
             if target_node == pr.end_ind {
                 *counter += 1;

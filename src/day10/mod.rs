@@ -58,10 +58,7 @@ fn corruption_score(line: &str) -> u64 {
     }
 
     if block_stack.is_empty() {
-        unreachable!(
-            "Every line should be bad, but found no issue with: {}",
-            line
-        )
+        unreachable!("Every line should be bad, but found no issue with: {}", line)
     }
 
     // but now this is incomplete
@@ -147,10 +144,7 @@ fn completion_score(line: &str) -> Option<u64> {
     }
 
     if block_stack.is_empty() {
-        unreachable!(
-            "Every line should be bad, but found no issue with: {}",
-            line
-        )
+        unreachable!("Every line should be bad, but found no issue with: {}", line)
     }
 
     // but now this is incomplete

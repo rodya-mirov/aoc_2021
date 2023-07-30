@@ -11,12 +11,7 @@ pub fn a() -> String {
 }
 
 fn a_with_input(input: &str) -> i32 {
-    let ParseResult {
-        xmin,
-        xmax,
-        ymin,
-        ymax,
-    } = parse(input);
+    let ParseResult { xmin, xmax, ymin, ymax } = parse(input);
 
     assert!(xmin <= xmax);
     assert!(ymin <= ymax);
@@ -122,12 +117,7 @@ pub fn b() -> String {
 }
 
 fn b_with_input(input: &str) -> u64 {
-    let ParseResult {
-        xmin,
-        xmax,
-        ymin,
-        ymax,
-    } = parse(input);
+    let ParseResult { xmin, xmax, ymin, ymax } = parse(input);
 
     assert!(xmin <= xmax);
     assert!(ymin <= ymax);

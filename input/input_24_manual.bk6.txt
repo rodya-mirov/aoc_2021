@@ -1,0 +1,261 @@
+inp w   W0
+z = W0+2
+
+inp w   W1
+z = (W0 + 2) * 26 + W1+4
+
+inp w   W2
+z = (((W0 + 2) * 26 + (W1 + 4)) * 26) + (W2 + 8)
+
+inp w   W3
+z = (((((W0 + 2) * 26 + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)
+
+inp w   W4
+z = (((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W4 + 12))
+
+inp w   W5
+z = IF (((W4+12)-14) == W5)
+    THEN (((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7))
+    ELSE ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W5 + 7)
+
+inp w   W6
+# at step 6+3
+x = IF (((W4+12)-14) == W5)
+    THEN (W3 + 7)
+    ELSE (W5 + 7)
+z = IF (((W4+12)-14) == W5)
+    THEN (((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8))
+    ELSE (((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7))
+
+# at step 6+4, which is mod x 26
+x = (IF ((((W4 + 12) + -14) == W5)) THEN ((W3 + 7)) ELSE ((W5 + 7)))
+
+# at step 6+5, which is div z 26
+z = (IF ((((W4 + 12) + -14) == W5)) THEN ((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8))) ELSE ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7))))
+
+# step 6+6 is a no-op, add x 0
+x = (IF ((((W4 + 12) + -14) == W5)) THEN ((W3 + 7)) ELSE ((W5 + 7)))
+
+# after step 6+7, which is eql x w
+x: (IF ((((W4 + 12) + -14) == W5)) THEN ((IF (((W3 + 7) == W6)) THEN (1) ELSE (0))) ELSE ((IF (((W5 + 7) == W6)) THEN (1) ELSE (0))))
+x = IF
+        ((W4 + 12) + -14) == W5
+    THEN
+        IF
+            (W3 + 7) == W6
+        THEN (1) ELSE (0)
+    ELSE
+        IF
+            (W5 + 7) == W6
+        THEN (1) ELSE (0)
+
+# after step 6+8, which is eql x 0; note there's no need for the special eql x 0 optimization
+# because we're distributing into the branches, which are constant, so can be const-evaluated
+x: (IF ((((W4 + 12) + -14) == W5)) THEN ((IF (((W3 + 7) == W6)) THEN (0) ELSE (1))) ELSE ((IF (((W5 + 7) == W6)) THEN (0) ELSE (1))))
+x = IF
+        ((W4 + 12) + -14) == W5
+    THEN
+        IF
+            (W3 + 7) == W6
+        THEN (0) ELSE (1)
+    ELSE
+        IF
+            (W5 + 7) == W6
+        THEN (0) ELSE (1)
+
+# after step 6+9 thru 6+12, which is mul y 0, mul y 25, mul y x, add y 1; note distribution + const evaluation takes care of everything
+y: (IF ((((W4 + 12) + -14) == W5)) THEN ((IF (((W3 + 7) == W6)) THEN (1) ELSE (26))) ELSE ((IF (((W5 + 7) == W6)) THEN (1) ELSE (26))))
+y = IF
+        ((W4 + 12) + -14) == W5
+    THEN
+        IF
+            (W3 + 7) == W6
+        THEN (1) ELSE (26)
+    ELSE
+        IF
+            (W5 + 7) == W6
+        THEN (1) ELSE (26)
+
+# after step 6+13, which is mul z y
+# recall z was this: so we get lots of condition folding
+# z = (IF ((((W4 + 12) + -14) == W5)) THEN ((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8))) ELSE ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7))))
+z: (IF ((((W4 + 12) + -14) == W5)) THEN ((IF (((W3 + 7) == W6)) THEN ((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8))) ELSE (((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26)))) ELSE ((IF (((W5 + 7) == W6)) THEN ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7))) ELSE (((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26)))))
+z = IF
+        ((W4 + 12) + -14) == W5
+    THEN
+        IF
+            (W3 + 7) == W6
+        THEN
+            ((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)
+        ELSE
+            (((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26
+    ELSE
+        IF
+            (W5 + 7) == W6
+        THEN
+            ((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)
+        ELSE
+            (((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26
+
+# after step 6+14 thru 6+16, which is mul y 0, add y w, add y 10
+y = W6+10
+
+# after step 6+17, which is mul y x
+y: (IF ((((W4 + 12) + -14) == W5)) THEN ((IF (((W3 + 7) == W6)) THEN (0) ELSE ((W6 + 10)))) ELSE ((IF (((W5 + 7) == W6)) THEN (0) ELSE ((W6 + 10)))))
+y = IF
+        ((W4 + 12) + -14) == W5
+    THEN
+        IF
+            (W3 + 7) == W6
+        THEN (0) ELSE (W6+10)
+    ELSE
+        IF
+            (W5 + 7) == W6
+        THEN (0) ELSE (W6+10)
+
+# after 6+18, which is add z y
+z: (IF ((((W4 + 12) + -14) == W5)) THEN ((IF (((W3 + 7) == W6)) THEN ((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8))) ELSE ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W6 + 10))))) ELSE ((IF (((W5 + 7) == W6)) THEN ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7))) ELSE ((((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W6 + 10))))))
+z = IF
+        ((((W4 + 12) + -14) == W5))
+    THEN
+        IF
+            (W3 + 7) == W6
+        THEN
+            ((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)
+        ELSE
+            ((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W6 + 10)
+    ELSE
+        IF
+            (W5 + 7) == W6
+        THEN
+            ((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)
+        ELSE
+            ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W6 + 10)
+
+
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 10
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 14
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -10
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 2
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 13
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 6
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -12
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 8
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -3
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 11
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -11
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 5
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -2
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 11
+mul y x
+add z y

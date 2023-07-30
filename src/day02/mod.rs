@@ -47,10 +47,7 @@ fn read_file(file_path: &str) -> Vec<FullCommand> {
     let mut buffer = String::new();
     f.read_to_string(&mut buffer).unwrap();
 
-    buffer
-        .lines()
-        .map(|line| line.parse::<FullCommand>().unwrap())
-        .collect()
+    buffer.lines().map(|line| line.parse::<FullCommand>().unwrap()).collect()
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]

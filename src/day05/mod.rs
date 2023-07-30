@@ -118,10 +118,7 @@ fn dir(a: i64, b: i64) -> i64 {
 
 fn parse(path: &str) -> Vec<((i64, i64), (i64, i64))> {
     let mut buffer = String::new();
-    File::open(path)
-        .unwrap()
-        .read_to_string(&mut buffer)
-        .unwrap();
+    File::open(path).unwrap().read_to_string(&mut buffer).unwrap();
 
     let comma_pair = |s: &str| {
         let mut toks = s.split(',').map(|t| t.parse::<i64>().unwrap());

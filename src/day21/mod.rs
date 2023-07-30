@@ -119,8 +119,7 @@ fn b_with_input(input: &str, target_score: u32) -> u128 {
                         };
                         // transposing intentional, this is simulating the other player now
                         // being up to roll
-                        let (addl_b, addl_a) =
-                            search_multiverse(flipped_state, cache, target_score);
+                        let (addl_b, addl_a) = search_multiverse(flipped_state, cache, target_score);
                         total_a += addl_a;
                         total_b += addl_b;
                     }
@@ -149,17 +148,11 @@ fn parse(input: &str) -> (usize, usize) {
     let mut lines = input.lines();
 
     let a = lines.next().unwrap();
-    let a: String = a
-        .chars()
-        .skip("Player 1 starting position: ".len())
-        .collect();
+    let a: String = a.chars().skip("Player 1 starting position: ".len()).collect();
     let a: usize = a.parse().unwrap();
 
     let b = lines.next().unwrap();
-    let b: String = b
-        .chars()
-        .skip("Player 2 starting position: ".len())
-        .collect();
+    let b: String = b.chars().skip("Player 2 starting position: ".len()).collect();
     let b: usize = b.parse().unwrap();
 
     assert_eq!(lines.next(), None);

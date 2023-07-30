@@ -35,6 +35,7 @@ mod day20;
 mod day21;
 mod day22;
 mod day23;
+mod day24;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 enum Side {
@@ -55,10 +56,7 @@ fn main() -> Result<(), String> {
     let args: Vec<String> = env::args().collect();
 
     if args.len() != 3 {
-        Err(
-            "Usage: [run] [problemnumber] [subcase] ; eg:\n\tcargo run --release -- 1 a"
-                .to_string(),
-        )
+        Err("Usage: [run] [problemnumber] [subcase] ; eg:\n\tcargo run --release -- 1 a".to_string())
     } else {
         let a: i32 = args[1]
             .parse::<i32>()
@@ -121,6 +119,8 @@ fn main() -> Result<(), String> {
             (22, Side::B) => Ok(day22::b()),
             (23, Side::A) => Ok(day23::a()),
             (23, Side::B) => Ok(day23::b()),
+            (24, Side::A) => Ok(day24::a()),
+            (24, Side::B) => Ok(day24::b()),
             (day, side) => Err(format!("Day {}, side {} is not yet supported", day, side)),
         }?;
 

@@ -1,6 +1,4 @@
-use nom::{
-    bytes::complete::tag, character::complete::digit1, combinator::map, sequence::tuple, IResult,
-};
+use nom::{bytes::complete::tag, character::complete::digit1, combinator::map, sequence::tuple, IResult};
 
 fn input() -> String {
     std::fs::read_to_string("input/input_18.txt").expect("Should be able to read the file")
@@ -138,24 +136,10 @@ fn try_explode(sn: SnailNum) -> (SnailNum, bool) {
                 } else {
                     let snr = sn.as_mut();
                     let left = &mut snr.0;
-                    find_explosion(
-                        left,
-                        running_index,
-                        depth + 1,
-                        left_overflow,
-                        right_overflow,
-                        explode_found,
-                    );
+                    find_explosion(left, running_index, depth + 1, left_overflow, right_overflow, explode_found);
 
                     let right = &mut snr.1;
-                    find_explosion(
-                        right,
-                        running_index,
-                        depth + 1,
-                        left_overflow,
-                        right_overflow,
-                        explode_found,
-                    );
+                    find_explosion(right, running_index, depth + 1, left_overflow, right_overflow, explode_found);
                 }
             }
         }
@@ -172,13 +156,7 @@ fn try_explode(sn: SnailNum) -> (SnailNum, bool) {
 
     // running_index is now the index of an exploded point (which is now zero)
 
-    fn traverse_and_add(
-        sn: &mut Element,
-        running_index: &mut usize,
-        target_index: usize,
-        left_overflow_amt: u64,
-        right_overflow_amt: u64,
-    ) {
+    fn traverse_and_add(sn: &mut Element, running_index: &mut usize, target_index: usize, left_overflow_amt: u64, right_overflow_amt: u64) {
         match *sn {
             Element::Num(ref mut val_ref) => {
                 if *running_index + 1 == target_index {
@@ -190,32 +168,14 @@ fn try_explode(sn: SnailNum) -> (SnailNum, bool) {
             }
             Element::Pair(ref mut sn) => {
                 let SnailNum(a, b) = sn.as_mut();
-                traverse_and_add(
-                    a,
-                    running_index,
-                    target_index,
-                    left_overflow_amt,
-                    right_overflow_amt,
-                );
-                traverse_and_add(
-                    b,
-                    running_index,
-                    target_index,
-                    left_overflow_amt,
-                    right_overflow_amt,
-                );
+                traverse_and_add(a, running_index, target_index, left_overflow_amt, right_overflow_amt);
+                traverse_and_add(b, running_index, target_index, left_overflow_amt, right_overflow_amt);
             }
         }
     }
 
     if explode_found {
-        traverse_and_add(
-            &mut sn,
-            &mut 0,
-            running_index,
-            left_overflow,
-            right_overflow,
-        );
+        traverse_and_add(&mut sn, &mut 0, running_index, left_overflow, right_overflow);
     }
 
     // todo: apply overflow
@@ -236,8 +196,7 @@ fn try_split(sn: SnailNum) -> (SnailNum, bool) {
                     let left = *v / 2;
                     let right = (*v + 1) / 2;
                     assert_eq!(left + right, *v);
-                    *sn =
-                        Element::Pair(Box::new(SnailNum(Element::Num(left), Element::Num(right))));
+                    *sn = Element::Pair(Box::new(SnailNum(Element::Num(left), Element::Num(right))));
                     true
                 }
             }
@@ -276,8 +235,7 @@ fn parse(input: &str) -> SnailNum {
     let input: String = input.chars().filter(|c| !c.is_whitespace()).collect();
 
     fn parse_pair(input: &str) -> IResult<&str, SnailNum> {
-        let (input, (_, a, _, b, _)) =
-            tuple((tag("["), parse_element, tag(","), parse_element, tag("]")))(input)?;
+        let (input, (_, a, _, b, _)) = tuple((tag("["), parse_element, tag(","), parse_element, tag("]")))(input)?;
 
         let sn = SnailNum(a, b);
 
@@ -366,14 +324,8 @@ mod tests {
             ("[[6,[5,[4,[3,2]]]],1]", "[[6,[5,[7,0]]],3]"),
             // reversed copy of the above, to capture the left thing
             ("[1,[[[[2,3],4],5],6]]", "[3,[[[0,7],5],6]]"),
-            (
-                "[[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]",
-                "[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]",
-            ),
-            (
-                "[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]",
-                "[[3,[2,[8,0]]],[9,[5,[7,0]]]]",
-            ),
+            ("[[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]", "[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]"),
+            ("[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]", "[[3,[2,[8,0]]],[9,[5,[7,0]]]]"),
         ] {
             test_does_explode(input, expected);
         }
@@ -439,9 +391,7 @@ mod tests {
 [[[5,[7,4]],7],1]
 [[[[4,2],2],6],[8,7]]";
         let actual = a_with_input(input);
-        let expected = magnitude(&parse(
-            "[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]",
-        ));
+        let expected = magnitude(&parse("[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]"));
 
         assert_eq!(expected, actual);
     }
@@ -459,9 +409,7 @@ mod tests {
 [[2,[[7,7],7]],[[5,8],[[9,3],[0,2]]]]
 [[[[5,2],5],[8,[3,7]]],[[5,[7,5]],[4,4]]]";
         let actual = a_with_input(input);
-        let expected = magnitude(&parse(
-            "[[[[6,6],[7,6]],[[7,7],[7,0]]],[[[7,7],[7,7]],[[7,8],[9,9]]]]",
-        ));
+        let expected = magnitude(&parse("[[[[6,6],[7,6]],[[7,7],[7,0]]],[[[7,7],[7,7]],[[7,8],[9,9]]]]"));
 
         assert_eq!(expected, actual);
     }

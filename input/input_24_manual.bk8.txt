@@ -1,0 +1,291 @@
+inp w   W0
+z = W0+2
+
+inp w   W1
+z = (W0 + 2) * 26 + W1+4
+
+inp w   W2
+z = (((W0 + 2) * 26 + (W1 + 4)) * 26) + (W2 + 8)
+
+inp w   W3
+z = (((((W0 + 2) * 26 + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)
+
+inp w   W4
+z = (((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W4 + 12))
+
+inp w   W5
+z = IF (((W4+12)-14) == W5)
+    THEN (((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7))
+    ELSE ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W5 + 7)
+
+inp w   W6
+z = IF
+        ((((W4 + 12) + -14) == W5))
+    THEN
+        IF
+            (W3 + 7) == W6
+        THEN
+            ((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)
+        ELSE
+            ((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W6 + 10)
+    ELSE
+        IF
+            (W5 + 7) == W6
+        THEN
+            ((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)
+        ELSE
+            ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W6 + 10)
+
+
+inp w   W7
+z = IF
+        ((((W4 + 12) + -14) == W5))
+    THEN
+        IF
+            (W3 + 7) == W6
+        THEN
+            ((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W7 + 14)
+        ELSE
+            ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W6 + 10)) * 26) + (W7 + 14)
+    ELSE
+        IF
+            (W5 + 7) == W6
+        THEN
+            ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W7 + 14)
+        ELSE
+            ((((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W6 + 10)) * 26) + (W7 + 14)
+
+inp w   W8
+# after steps 8:1-8:4, have "set x (z%26)" -- note we have if_true and if_false the same a lot, so we should collapse ternaries
+x = W7 + 14
+
+# after step 8:5, which is div z 26
+z = IF
+        ((((W4 + 12) + -14) == W5))
+    THEN
+        IF
+            (W3 + 7) == W6
+        THEN
+            ((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)
+        ELSE
+            ((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W6 + 10)
+    ELSE
+        IF
+            (W5 + 7) == W6
+        THEN
+            ((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)
+        ELSE
+            ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W6 + 10)
+
+# after step 8:6-8:8, which is "set x ((W7+14)-10 != w)"
+x = IF
+        ((W7 + 14) + -10) == W8
+    THEN (0) ELSE (1)
+
+# then steps 8:9-8:12 (mul y 0, add y 25, mul y x, add y 1) are "set y ((x*25)+1)" which distributes well
+y = (IF ((((W7 + 14) + -10) == W8)) THEN (1) ELSE (26))
+
+# then step 8:13 (mul z y) is a little sad, we do have to introduce a new condition ((W7+14)+-10==W8)
+z: (IF ((((W7 + 14) + -10) == W8)) THEN ((IF ((((W4 + 12) + -14) == W5)) THEN ((IF (((W3 + 7) == W6)) THEN ((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8))) ELSE ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W6 + 10))))) ELSE ((IF (((W5 + 7) == W6)) THEN ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7))) ELSE ((((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W6 + 10))))))) ELSE ((IF ((((W4 + 12) + -14) == W5)) THEN ((IF (((W3 + 7) == W6)) THEN (((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26)) ELSE (((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W6 + 10)) * 26)))) ELSE ((IF (((W5 + 7) == W6)) THEN (((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26)) ELSE (((((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W6 + 10)) * 26)))))))
+z = IF
+        ((W7 + 14) + -10) == W8
+    THEN
+        IF
+            ((W4 + 12) + -14) == W5
+        THEN
+            IF
+                (W3 + 7) == W6
+            THEN
+                ((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)
+            ELSE
+                ((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W6 + 10)
+        ELSE
+            IF
+                (W5 + 7) == W6
+            THEN
+                ((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)
+            ELSE
+                ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W6 + 10)
+    ELSE
+        IF
+            ((W4 + 12) + -14) == W5
+        THEN
+            IF
+                (W3 + 7) == W6
+            THEN
+                (((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26
+            ELSE
+                (((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W6 + 10)) * 26
+        ELSE
+            IF
+                (W5 + 7) == W6
+            THEN
+                (((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26
+            ELSE
+                (((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W6 + 10)) * 26
+
+
+# then steps 8:14-8:17 (mul y 0, add y w, add y 2, mul y x) account to "set y (W8+2)*x"
+y = IF
+        ((W7 + 14) + -10) == W8
+    THEN (0) ELSE (W8+2)
+
+# and finally 8:18 (add z y); we already have that condition in play, so it's just adding (W8+2) to some branches
+
+# auto
+z = IF
+        ((W7 + 14) + -10) == W8
+    THEN
+        IF
+            ((((W4 + 12) + -14) == W5))
+        THEN
+            IF
+                (((W3 + 7) == W6))
+            THEN
+                ((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)))
+            ELSE
+                ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W6 + 10)))
+        ELSE
+            IF
+                (((W5 + 7) == W6))
+            THEN
+                ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)))
+            ELSE
+                ((((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W6 + 10)))
+    ELSE
+        IF
+            ((((W4 + 12) + -14) == W5))
+        THEN
+            IF (((W3 + 7) == W6)) THEN ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W8 + 2))) ELSE ((((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W6 + 10)) * 26) + (W8 + 2)))
+        ELSE
+            IF (((W5 + 7) == W6)) THEN ((((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W8 + 2))) ELSE ((((((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W6 + 10)) * 26) + (W8 + 2)))
+
+# made by hand ...
+z = IF
+        ((W7 + 14) + -10) == W8
+    THEN
+        IF
+            ((W4 + 12) + -14) == W5
+        THEN
+            IF
+                (W3 + 7) == W6
+            THEN
+                ((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)
+            ELSE
+                ((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W6 + 10)
+        ELSE
+            IF
+                (W5 + 7) == W6
+            THEN
+                ((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)
+            ELSE
+                ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W6 + 10)
+    ELSE
+        IF
+            ((W4 + 12) + -14) == W5
+        THEN
+            IF
+                (W3 + 7) == W6
+            THEN
+                ((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W8+2)
+            ELSE
+                ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W6 + 10)) * 26) + (W8+2)
+        ELSE
+            IF
+                (W5 + 7) == W6
+            THEN
+                ((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W8+2)
+            ELSE
+                ((((((((((W0 + 2) * 26) + (W1 + 4)) * 26) + (W2 + 8)) * 26) + (W3 + 7)) * 26) + (W6 + 10)) * 26) + (W8+2)
+
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 13
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 6
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -12
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 8
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -3
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 11
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -11
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 5
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -2
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 11
+mul y x
+add z y

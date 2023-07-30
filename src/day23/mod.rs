@@ -76,12 +76,7 @@ enum Position {
 /// For each state accessible from this state, adds an element to the buffer which is
 /// of the form (additional_cost, state_after_move)
 fn set_neighbors<const N: usize>(state: State<N>, buffer: &mut Vec<(u64, State<N>)>) {
-    let rooms_available = [
-        state.room_ready(0),
-        state.room_ready(1),
-        state.room_ready(2),
-        state.room_ready(3),
-    ];
+    let rooms_available = [state.room_ready(0), state.room_ready(1), state.room_ready(2), state.room_ready(3)];
 
     // first, check for dudes in the hallway
     for hallway_pos in 0..HALLWAY_WIDTH {
@@ -120,10 +115,7 @@ fn set_neighbors<const N: usize>(state: State<N>, buffer: &mut Vec<(u64, State<N
 
         let room = state.rooms[room_idx];
 
-        if let Some(room_pos) = (0..N)
-            .filter(|&room_pos| room.occupants[room_pos] != Occupant::Empty)
-            .next()
-        {
+        if let Some(room_pos) = (0..N).filter(|&room_pos| room.occupants[room_pos] != Occupant::Empty).next() {
             let occ = room.occupants[room_pos];
 
             for hallway_pos in ALLOWED_HALLWAY_POSITIONS.iter().copied() {
@@ -134,10 +126,7 @@ fn set_neighbors<const N: usize>(state: State<N>, buffer: &mut Vec<(u64, State<N
                     let tile_cost = occ.per_tile_cost();
                     let addl_cost = dist * tile_cost;
                     let mut new_state = state.clone();
-                    std::mem::swap(
-                        &mut new_state.hall[hallway_pos],
-                        &mut new_state.rooms[room_idx].occupants[room_pos],
-                    );
+                    std::mem::swap(&mut new_state.hall[hallway_pos], &mut new_state.rooms[room_idx].occupants[room_pos]);
                     buffer.push((addl_cost, new_state));
                 }
             }
@@ -199,10 +188,7 @@ struct Room<const N: usize> {
 impl<const N: usize> Room<N> {
     #[inline(always)]
     fn matches_goal(self, target: Occupant) -> bool {
-        self.occupants
-            .iter()
-            .copied()
-            .all(|c| c == Occupant::Empty || c == target)
+        self.occupants.iter().copied().all(|c| c == Occupant::Empty || c == target)
     }
 }
 
@@ -300,9 +286,7 @@ impl<const N: usize> State<N> {
 
                 match end {
                     Position::Hallway(e_hallway) => {
-                        if (0..s_room_pos)
-                            .any(|room_pos| start_room.occupants[room_pos] != Occupant::Empty)
-                        {
+                        if (0..s_room_pos).any(|room_pos| start_room.occupants[room_pos] != Occupant::Empty) {
                             return None;
                         }
 

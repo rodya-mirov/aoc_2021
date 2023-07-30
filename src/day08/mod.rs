@@ -29,13 +29,7 @@ fn a_with_input(input: &str) -> usize {
 
     lines
         .iter()
-        .map(|ParsedLine(_, ref output)| {
-            output
-                .iter()
-                .map(|s| s.len())
-                .filter(|&len| is_small(len))
-                .count()
-        })
+        .map(|ParsedLine(_, ref output)| output.iter().map(|s| s.len()).filter(|&len| is_small(len)).count())
         .sum()
 }
 
@@ -83,8 +77,7 @@ fn solve_line(input: ParsedLine) -> u32 {
     // of those, UR appears in 8 unique digits, and LR appears in 9, so we can distinguish
     let one_bits: [usize; 2] = one_rep.indexes();
 
-    let rep_size =
-        |segment_ind: usize| -> usize { seen.iter().filter(|digit| digit.0[segment_ind]).count() };
+    let rep_size = |segment_ind: usize| -> usize { seen.iter().filter(|digit| digit.0[segment_ind]).count() };
 
     let ur_ind: usize = only(one_bits.into_iter().filter(|&ind| rep_size(ind) == 8));
     let lr_ind: usize = only(one_bits.into_iter().filter(|&ind| rep_size(ind) == 9));
@@ -201,8 +194,7 @@ fn to_digit(s: &str) -> Digit {
 mod tests {
     use super::*;
 
-    const SAMPLE: &'static str =
-        "be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe
+    const SAMPLE: &'static str = "be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe
 edbfga begcd cbg gc gcadebf fbgde acbgfd abcde gfcbed gfec | fcgedb cgb dgebacf gc
 fgaebd cg bdaec gdafb agbcfd gdcbef bgcad gfac gcb cdgabef | cg cg fdcagb cbg
 fbegcd cbd adcefb dageb afcb bc aefdc ecdab fgdeca fcdbega | efabcd cedba gadfec cb

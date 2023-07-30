@@ -47,11 +47,7 @@ fn a_with_input(input: &str) -> u64 {
 
     let leftover_bits = bits.count();
 
-    assert!(
-        leftover_bits < 8,
-        "Shouldn't have too much leftover crud; got {}",
-        leftover_bits
-    );
+    assert!(leftover_bits < 8, "Shouldn't have too much leftover crud; got {}", leftover_bits);
 
     fn sum_versions(packet: &Packet) -> u64 {
         let mut total = packet.version as u64;
@@ -208,11 +204,7 @@ fn b_with_input(input: &str) -> u64 {
 
     let leftover_bits = bits.count();
 
-    assert!(
-        leftover_bits < 8,
-        "Shouldn't have too much leftover crud; got {}",
-        leftover_bits
-    );
+    assert!(leftover_bits < 8, "Shouldn't have too much leftover crud; got {}", leftover_bits);
 
     fn eval(packet: &Packet) -> u64 {
         match &packet.contents {

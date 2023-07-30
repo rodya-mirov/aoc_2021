@@ -75,17 +75,9 @@ fn compute_oxygen(numbers: &[u64], input_length: usize, bit_idx: usize) -> u64 {
     }
 
     let filtered: Vec<u64> = if ones * 2 >= original_length {
-        numbers
-            .iter()
-            .copied()
-            .filter(|n| (n & bit_flag) > 0)
-            .collect()
+        numbers.iter().copied().filter(|n| (n & bit_flag) > 0).collect()
     } else {
-        numbers
-            .iter()
-            .copied()
-            .filter(|n| (n & bit_flag) == 0)
-            .collect()
+        numbers.iter().copied().filter(|n| (n & bit_flag) == 0).collect()
     };
 
     compute_oxygen(&filtered, input_length, bit_idx + 1)
@@ -112,17 +104,9 @@ fn compute_scrubber(numbers: &[u64], input_length: usize, bit_idx: usize) -> u64
     }
 
     let filtered: Vec<u64> = if ones * 2 < original_length {
-        numbers
-            .iter()
-            .copied()
-            .filter(|n| (n & bit_flag) > 0)
-            .collect()
+        numbers.iter().copied().filter(|n| (n & bit_flag) > 0).collect()
     } else {
-        numbers
-            .iter()
-            .copied()
-            .filter(|n| (n & bit_flag) == 0)
-            .collect()
+        numbers.iter().copied().filter(|n| (n & bit_flag) == 0).collect()
     };
 
     compute_scrubber(&filtered, input_length, bit_idx + 1)
@@ -133,10 +117,7 @@ fn read_file(file_path: &str) -> Vec<u64> {
     let mut buffer = String::new();
     f.read_to_string(&mut buffer).unwrap();
 
-    buffer
-        .lines()
-        .map(|line| u64::from_str_radix(line, 2).unwrap())
-        .collect()
+    buffer.lines().map(|line| u64::from_str_radix(line, 2).unwrap()).collect()
 }
 
 #[cfg(test)]
