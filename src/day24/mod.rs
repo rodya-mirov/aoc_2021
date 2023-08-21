@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use exec::{BoundedSV, prune_conditions};
+use exec::{prune_conditions, BoundedSV};
 use parse::parse;
 
 mod bounds;
@@ -129,7 +129,7 @@ fn a_with_input(input: &str) -> String {
         }
     }
 
-    assert_eq!(always_false.len(), 0, "We didn't get any 'always false' conditions");
+    assert_eq!(always_false.len(), 0, "We don't expect any 'always false' conditions");
 
     unimplemented!()
 }
